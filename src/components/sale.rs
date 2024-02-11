@@ -13,94 +13,94 @@ pub fn SalesComponent(cx: Scope) -> impl IntoView {
     let (brands, set_brands) = create_signal::<Vec<model::FrameBrand>>(cx, vec![]);
     let (kinds, set_kinds) = create_signal::<Vec<model::SaleKind>>(cx, vec![]);
 
-    let fetch_sales = create_resource(cx, || (), request::fetch_sales);
-    let post_sale = create_resource(cx, new_sale, request::post_sale);
-    let update_sale = create_resource(cx, sale_to_update, request::update_sale);
-    let delete_sale = create_resource(cx, sale_to_delete, request::delete_sale);
-    let fetch_frame_brands = create_resource(cx, || (), request::fetch_frame_brands);
-    let fetch_sale_kinds = create_resource(cx, || (), request::fetch_sale_kinds);
+    // let fetch_sales = create_resource(cx, || (), request::fetch_sales);
+    // let post_sale = create_resource(cx, move || new_sale.get(), request::post_sale);
+    // let update_sale = create_resource(cx, move || sale_to_update.get(), request::update_sale);
+    // let delete_sale = create_resource(cx, move || sale_to_delete.get(), request::delete_sale);
+    // let fetch_frame_brands = create_resource(cx, || (), request::fetch_frame_brands);
+    // let fetch_sale_kinds = create_resource(cx, || (), request::fetch_sale_kinds);
 
     view! { cx,
         <div>
             <h3> "Total Sales Records" </h3>
             <div>
             "Add New Purchase"
-            <button on:click = move |_| set_new_sale(Some(model::PostSale::default()))>
+            <button on:click = move |_| set_new_sale.set(Some(model::PostSale::default()))>
             "+"
             </button>
             </div>
-            <Transition fallback=move || view! { cx, <div>"Initial Sales Read..."</div> }>
-            {
-                if let Some(Ok(sls)) = fetch_sales.read(cx) {
-                    set_sales.set(sls);
-                    console_log("Initial sales loaded.");
-                } else {
-                console_log("No sales to load initially.");
-                };
-            }
-            </Transition>
-            <Transition fallback = move || view! { cx, <div>"Loading Brands and Kinds..."</div> }>
-            {
-                if let (Some(Ok(brnds)), Some(Ok(knds))) = (fetch_frame_brands.read(cx), fetch_sale_kinds.read(cx)) {
-                    set_brands(brnds);
-                    set_kinds(knds);
-                };
-            }
-            </Transition>
-            <Transition fallback=move || view! { cx, <div>"Adding New Sale ..."</div> }>
-            {
-                if let Some(Ok(sl)) = post_sale.read(cx) {
-                    set_new_sale.set(None);
-                    set_sales.update(|sls| sls.push(sl));
-                    console_log("New sale Added.");
-                } else {
-                    console_log("No sales to add...");
-                };
-            }
-            </Transition>
-            <Transition fallback = move || view! { cx, <div>"Loading Delete Sale Effect..."</div> }>
-            {
-                if let Some(Ok(id)) = delete_sale.read(cx) {
-                    set_sale_to_delete.set_untracked(None);
-                    set_sales.update(|sls| {
-                        *sls = sls
-                            .iter()
-                            .filter(|sl| sl.id != Some(id as i64))
-                            .cloned()
-                            .collect::<Vec<_>>();
-                    });
-                } else {
-                    console_log("No sale to delete...");
-                };
-            }
-            </Transition>
-            <Transition fallback = move || view! { cx, <div>"Loading Update Sale Effect..."</div> }>
-            {
-                if let Some(Ok(sale)) = update_sale.read(cx) {
-                    console_log("Updating Sale...");
-                    set_sale_to_update.set_untracked(None);
-                    // set_sale_to_update(None);
-                    set_sales.update(|sls| {
-                        for sl in sls {
-                            if sl.id == sale.id {
-                                *sl = sale;
-                                break
-                            }
-                        }
-                    });
-                } else {
-                    console_log("No sales to Update!");
-                };
-            }
-            </Transition>
-            <SalesTable
-                sales=sales
-                brands=brands
-                kinds=kinds
-                set_delete_id=set_sale_to_delete
-                set_update=set_sale_to_update
-            />
-            <Calculations sales=sales brands=brands kinds=kinds/>
+            // <Transition fallback=move || view! { cx, <div>"Initial Sales Read..."</div> }>
+            // {
+            //     if let Some(Ok(sls)) = fetch_sales.read(cx) {
+            //         set_sales.set(sls);
+            //         console_log("Initial sales loaded.");
+            //     } else {
+            //     console_log("No sales to load initially.");
+            //     };
+            // }
+            // </Transition>
+            // <Transition fallback = move || view! { cx, <div>"Loading Brands and Kinds..."</div> }>
+            // {
+            //     if let (Some(Ok(brnds)), Some(Ok(knds))) = (fetch_frame_brands.read(cx), fetch_sale_kinds.read(cx)) {
+            //         set_brands.set(brnds);
+            //         set_kinds.set(knds);
+            //     };
+            // }
+            // </Transition>
+            // <Transition fallback=move || view! { cx, <div>"Adding New Sale ..."</div> }>
+            // {
+            //     if let Some(Ok(sl)) = post_sale.read(cx) {
+            //         set_new_sale.set(None);
+            //         set_sales.update(|sls| sls.push(sl));
+            //         console_log("New sale Added.");
+            //     } else {
+            //         console_log("No sales to add...");
+            //     };
+            // }
+            // </Transition>
+            // <Transition fallback = move || view! { cx, <div>"Loading Delete Sale Effect..."</div> }>
+            // {
+            //     if let Some(Ok(id)) = delete_sale.read(cx) {
+            //         set_sale_to_delete.set_untracked(None);
+            //         set_sales.update(|sls| {
+            //             *sls = sls
+            //                 .iter()
+            //                 .filter(|sl| sl.id != Some(id as i64))
+            //                 .cloned()
+            //                 .collect::<Vec<_>>();
+            //         });
+            //     } else {
+            //         console_log("No sale to delete...");
+            //     };
+            // }
+            // </Transition>
+            // <Transition fallback = move || view! { cx, <div>"Loading Update Sale Effect..."</div> }>
+            // {
+            //     if let Some(Ok(sale)) = update_sale.read(cx) {
+            //         console_log("Updating Sale...");
+            //         set_sale_to_update.set_untracked(None);
+            //         // set_sale_to_update(None);
+            //         set_sales.update(|sls| {
+            //             for sl in sls {
+            //                 if sl.id == sale.id {
+            //                     *sl = sale;
+            //                     break
+            //                 }
+            //             }
+            //         });
+            //     } else {
+            //         console_log("No sales to Update!");
+            //     };
+            // }
+            // </Transition>
+            // <SalesTable
+            //     sales=sales
+            //     brands=brands
+            //     kinds=kinds
+            //     set_delete_id=set_sale_to_delete
+            //     set_update=set_sale_to_update
+            // />
+            // <Calculations sales=sales brands=brands kinds=kinds/>
         </div>
     }
 }
@@ -124,7 +124,7 @@ pub fn SalesTable(
             <tbody>
             {
                 move || {
-                    let mut sls = sales();
+                    let mut sls = sales.get();
                     sls.sort_by(|a, b| a.id.cmp(&b.id));
                     sls.into_iter().rev().map(|sale| view! { cx,
                         < EntryView
@@ -157,21 +157,21 @@ pub fn EntryView(
     // let selected_quantity = create_rw_signal(cx, sale.quantity as u32);
 
     let on_quantity_input = move |ev| {
-        set_sale(Some(model::Sale {
+        set_sale.set(Some(model::Sale {
             quantity: event_target_value(&ev).parse::<i32>().unwrap_or(0),
             ..sale
         }));
     };
 
     let on_salekind_input = move |ev| {
-        set_sale(Some(model::Sale {
+        set_sale.set(Some(model::Sale {
             sale_kind_id: event_target_value(&ev).parse::<i32>().unwrap_or(1),
             ..sale
         }));
     };
 
     let on_framebrand_input = move |ev| {
-        set_sale(Some(model::Sale {
+        set_sale.set(Some(model::Sale {
             frame_brand_id: event_target_value(&ev).parse::<i32>().ok(),
             ..sale
         }));
@@ -195,7 +195,7 @@ pub fn EntryView(
                 on:input = on_salekind_input
             >
             { move ||
-                kinds()
+                kinds.get()
                 .into_iter()
                 .map(|k| view! { cx,
                     <option
@@ -214,7 +214,7 @@ pub fn EntryView(
                 on:input = on_framebrand_input
             >
             { move ||
-                brands()
+                brands.get()
                 .into_iter()
                 .map(|k| view! { cx,
                     <option
@@ -234,7 +234,7 @@ pub fn EntryView(
             />
         </td>
         <td>
-            <button on:click = move |_| set_delete_id(sale.id.map(|n| n as u32))>
+            <button on:click = move |_| set_delete_id.set(sale.id.map(|n| n as u32))>
             "X"
             </button>
         </td>
